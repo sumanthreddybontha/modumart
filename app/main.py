@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from app.routers import auth
 from app.database import Base, engine
 
-# Initialize database
+# Initialize db
 def init_db():
     Base.metadata.create_all(bind=engine)
 
