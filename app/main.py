@@ -1,12 +1,17 @@
+
 from fastapi import FastAPI
 from app.routers import auth
 from app.database import Base, engine
 
-# Create DB tables
-Base.metadata.create_all(bind=engine)
+# Initialize database
+def init_db():
+    Base.metadata.create_all(bind=engine)
 
-# FastAPI app instance
-app = FastAPI()
+# Create FastAPI app instance
+app = FastAPI(title="ModuMart API", version="1.0")
 
-# Register routes
+# Call DB setup at startup
+init_db()
+
+# Register routers
 app.include_router(auth.router)
