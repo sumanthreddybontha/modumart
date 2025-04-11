@@ -4,6 +4,7 @@ from app.database import SessionLocal
 from app.models.user import User
 from app.schemas.user import UserCreate, UserLogin, UserResponse
 from app.services.auth_service import hash_password, verify_password, create_access_token
+from app.services.auth_utils import get_current_user
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -37,6 +38,21 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 def login(credentials: UserLogin, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == credentials.username).first()
     if not user or not verify_password(credentials.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    token = create_access_token(data={"sub": str(user.id)})
+    return {"access_token": token, "token_type": "bearer"}
+
+@router.get("/me", response_model=UserResponse)
+def read_current_user(current_user: User = Depends(get_current_user)):
+    return current_user
+
+from fastapi.security import OAuth2PasswordRequestForm
+
+@router.post("/token")
+def token_login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.username == form_data.username).first()
+    if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     token = create_access_token(data={"sub": str(user.id)})
