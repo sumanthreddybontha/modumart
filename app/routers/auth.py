@@ -6,6 +6,9 @@ from app.models.user import User
 from app.schemas.user import UserCreate, UserLogin, UserResponse
 from app.services.auth_service import hash_password, verify_password, create_access_token
 from app.services.auth_utils import get_current_user
+from app.services.auth_utils import require_admin
+from pydantic import BaseModel
+
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -16,6 +19,10 @@ def get_db():
         yield db
     finally:
         db.close()
+        
+@router.get("/me")
+def get_me(current_user = Depends(get_current_user)):
+    return {"username": current_user.username}
 
 # Register route
 @router.post("/register", response_model=UserResponse)
@@ -56,3 +63,10 @@ def token_login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
 
     token = create_access_token(data={"sub": str(user.id)})
     return {"access_token": token, "token_type": "bearer"}
+
+class AdminDashboardResponse(BaseModel):
+    message: str
+
+@router.get("/admin/dashboard", response_model=AdminDashboardResponse)
+def get_admin_dashboard(current_admin: User = Depends(require_admin)):
+    return {"message": f"Welcome Admin {current_admin.username}!"}
