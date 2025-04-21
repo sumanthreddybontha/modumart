@@ -3,7 +3,11 @@ from fastapi import FastAPI
 from app.routers import auth
 from app.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
-from app.cart import router as cart_router
+#from app.cart import router as cart_router
+from app.models import order
+from app.cart.router import router as cart_router
+
+
 
 # Initialize db
 def init_db():
@@ -26,4 +30,4 @@ init_db()
 # Register routers
 app.include_router(auth.router)
 
-app.include_router(cart_router.router)
+app.include_router(cart_router)
