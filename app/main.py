@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.models import order
 from app.cart.router import router as cart_router
 from app.orders.router import router as orders_router
+from app.models import product
 
 # Initialize db
 def init_db():
@@ -31,3 +32,5 @@ app.include_router(auth.router)
 app.include_router(cart_router)
 
 app.include_router(orders_router)
+
+Base.metadata.create_all(bind=engine)
