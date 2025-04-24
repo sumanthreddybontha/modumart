@@ -31,6 +31,6 @@ ModuMart is a modular, microservices-ready marketplace platform built to demonst
 ## 🚀 Getting Started
 
 ```bash
-git clone https://github.com/your-username/modumart.git
+git clone https://github.com/sumanthreddybontha/modumart.git
 cd modumart
 docker-compose up --build
